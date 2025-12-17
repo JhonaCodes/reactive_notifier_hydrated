@@ -1,6 +1,6 @@
 name: reactive_notifier_hydrated
 description: "Hydrated extension for ReactiveNotifier - Automatic state persistence with customizable storage backends. Persist and restore your application state seamlessly."
-version: 2.16.0
+version: 2.16.1
 homepage: https://github.com/JhonaCodes/reactive_notifier_hydrated
 repository: https://github.com/JhonaCodes/reactive_notifier_hydrated
 issue_tracker: https://github.com/JhonaCodes/reactive_notifier_hydrated/issues
@@ -13,13 +13,13 @@ topics:
   - cache
 
 environment:
-  sdk: ^3.5.4
+  sdk: ^3.10.0
   flutter: ">=1.17.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  reactive_notifier: ^2.16.0
+  reactive_notifier: ^2.16.1
   shared_preferences: ^2.2.0
 
 dev_dependencies:

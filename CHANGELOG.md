@@ -1,51 +1,26 @@
-# Changelog
+# 2.16.1
+## Version Sync & Documentation
 
-All notable changes to this project will be documented in this file.
+### Updates
+- Synchronized version with reactive_notifier ecosystem (2.16.1)
+- Updated Dart SDK requirement to ^3.10.0
+- Updated dependency to reactive_notifier ^2.16.1
+- Fixed GitHub username references in documentation
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### Documentation
+- Updated README examples and version references
+- Enhanced documentation with complete API patterns
 
-## [2.16.0] - 2024-12-11
+---
 
-### Initial Release - State Persistence for ReactiveNotifier
+# 2.16.0
+## Initial Release - State Persistence for ReactiveNotifier
 
-This is the initial release of `reactive_notifier_hydrated`, providing automatic state persistence for ReactiveNotifier state management.
+### New Features
 
-#### Features
-
-- **HydratedReactiveNotifier**: Wrapper around ReactiveNotifier with automatic persistence
-- **HydratedViewModel**: ViewModel extension with automatic state persistence
-- **HydratedAsyncViewModelImpl**: AsyncViewModelImpl extension with caching (stale-while-revalidate)
-- **HydratedMixin**: Shared mixin for custom implementations
-- **HydratedStorage**: Abstract storage interface
-- **SharedPreferencesStorage**: Default storage implementation
-
-#### Capabilities
-
-- Automatic state persistence on every change
-- Hydration on app restart
-- Version migration support
-- Debounce support for optimizing writes
-- Custom storage backends (Hive, SQLite, Secure Storage)
-- Stale-while-revalidate pattern for async data
-
-#### Integration
-
-- Fully compatible with ReactiveNotifier 2.16.0
-- Uses onStateChanged/onAsyncStateChanged hooks
-- Follows ReactiveNotifier patterns and conventions
-
-#### Usage Example
-
+#### HydratedReactiveNotifier<T>
+Wrapper around ReactiveNotifier with automatic persistence:
 ```dart
-// Initialize storage in main()
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  HydratedNotifier.storage = await SharedPreferencesStorage.getInstance();
-  runApp(MyApp());
-}
-
-// Simple state with persistence
 mixin SettingsService {
   static final settings = HydratedReactiveNotifier<SettingsState>(
     create: () => SettingsState.defaults(),
@@ -61,8 +36,11 @@ mixin SettingsService {
     },
   );
 }
+```
 
-// ViewModel with persistence
+#### HydratedViewModel<T>
+ViewModel extension with automatic state persistence:
+```dart
 class UserPreferencesViewModel extends HydratedViewModel<UserPreferences> {
   UserPreferencesViewModel() : super(
     initialState: UserPreferences.defaults(),
@@ -75,8 +53,34 @@ class UserPreferencesViewModel extends HydratedViewModel<UserPreferences> {
     transformState((s) => s.copyWith(isDarkMode: !s.isDarkMode));
   }
 }
+```
 
-// Custom storage backend (Hive example)
+#### HydratedAsyncViewModelImpl<T>
+AsyncViewModelImpl extension with caching (stale-while-revalidate pattern):
+```dart
+class UserViewModel extends HydratedAsyncViewModelImpl<UserModel> {
+  UserViewModel() : super(
+    AsyncState.initial(),
+    storageKey: 'user_data',
+    toJson: (user) => user.toJson(),
+    fromJson: (json) => UserModel.fromJson(json),
+    loadOnInit: true,  // Automatically refresh data
+  );
+
+  @override
+  Future<UserModel> init() async {
+    // Cached data shown immediately while this loads
+    return await userRepository.fetchCurrentUser();
+  }
+}
+```
+
+#### HydratedMixin<T>
+Shared mixin for custom implementations with configurable options.
+
+#### HydratedStorage Interface
+Abstract storage interface for custom backends:
+```dart
 class HiveStorage implements HydratedStorage {
   final Box _box;
   HiveStorage(this._box);
@@ -93,19 +97,48 @@ class HiveStorage implements HydratedStorage {
   }
 
   @override
-  Future<void> delete(String key) async {
-    await _box.delete(key);
-  }
+  Future<void> delete(String key) async => await _box.delete(key);
 
   @override
-  Future<void> clear() async {
-    await _box.clear();
-  }
+  Future<void> clear() async => await _box.clear();
+}
+```
+
+#### SharedPreferencesStorage
+Default storage implementation using SharedPreferences.
+
+### Core Capabilities
+- **Automatic Persistence**: State automatically persisted on every change
+- **Hydration**: State restored on app restart
+- **Version Migration**: Handle schema changes between app versions
+- **Debounce Support**: Optimize write operations
+- **Custom Storage**: Support for Hive, SQLite, Secure Storage, and more
+- **Stale-While-Revalidate**: Show cached data immediately while refreshing
+
+### API Methods
+- `isHydrated`: Check if hydration from storage is complete
+- `hydrationComplete`: Future that completes when hydration is done
+- `persistNow()`: Force immediate persistence (bypasses debounce)
+- `clearPersistedState()`: Clear persisted data from storage
+- `reset()`: Clear storage and recreate with factory default
+
+### Integration
+- Fully compatible with ReactiveNotifier 2.16.0+
+- Uses `onStateChanged`/`onAsyncStateChanged` hooks automatically
+- Works with all ReactiveNotifier builders
+- Follows ReactiveNotifier patterns and conventions
+
+### Setup
+```dart
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  HydratedNotifier.storage = await SharedPreferencesStorage.getInstance();
+  runApp(MyApp());
 }
 ```
 
 ### Dependencies
-
 - Requires `reactive_notifier: ^2.16.0`
 - Requires `shared_preferences: ^2.2.0`
-- Compatible with Flutter SDK >=1.17.0
+- Dart SDK: ^3.5.4
+- Flutter SDK: >=1.17.0
