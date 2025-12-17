@@ -17,7 +17,7 @@ Hydrated extension for [ReactiveNotifier](https://pub.dev/packages/reactive_noti
 
 ```yaml
 dependencies:
-  reactive_notifier_hydrated: ^1.0.0
+  reactive_notifier_hydrated: ^2.16.0
 ```
 
 ### 2. Initialize storage
